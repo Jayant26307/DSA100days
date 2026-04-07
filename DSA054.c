@@ -9,11 +9,6 @@ struct Node {
     struct Node* right;
 };
 
-struct Pair {
-    struct Node* node;
-    int hd;
-};
-
 struct Node* createNode(int data) {
     struct Node* newnode = (struct Node*)malloc(sizeof(struct Node));
     newnode->data = data;
@@ -34,42 +29,46 @@ struct Node* buildTree(int arr[], int n, int i) {
     return root;
 }
 
-void verticalOrder(struct Node* root) {
+void zigzagTraversal(struct Node* root) {
 
     if(root == NULL)
         return;
 
-    struct Pair queue[MAX];
+    struct Node* queue[MAX];
     int front = 0, rear = 0;
 
-    int columns[200][100];
-    int count[200] = {0};
+    int leftToRight = 1;
 
-    int offset = 100;
-
-    queue[rear++] = (struct Pair){root, 0};
+    queue[rear++] = root;
 
     while(front < rear) {
 
-        struct Pair temp = queue[front++];
-        struct Node* node = temp.node;
-        int hd = temp.hd + offset;
+        int size = rear - front;
+        int level[size];
 
-        columns[hd][count[hd]++] = node->data;
+        for(int i = 0; i < size; i++) {
 
-        if(node->left)
-            queue[rear++] = (struct Pair){node->left, temp.hd - 1};
+            struct Node* node = queue[front++];
 
-        if(node->right)
-            queue[rear++] = (struct Pair){node->right, temp.hd + 1};
-    }
+            int index;
+            if(leftToRight)
+                index = i;
+            else
+                index = size - i - 1;
 
-    for(int i = 0; i < 200; i++) {
-        if(count[i] > 0) {
-            for(int j = 0; j < count[i]; j++)
-                printf("%d ", columns[i][j]);
-            printf("\n");
+            level[index] = node->data;
+
+            if(node->left)
+                queue[rear++] = node->left;
+
+            if(node->right)
+                queue[rear++] = node->right;
         }
+
+        for(int i = 0; i < size; i++)
+            printf("%d ", level[i]);
+
+        leftToRight = !leftToRight;
     }
 }
 
@@ -85,7 +84,7 @@ int main() {
 
     struct Node* root = buildTree(arr, n, 0);
 
-    verticalOrder(root);
+    zigzagTraversal(root);
 
     return 0;
 }
